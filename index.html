@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coupon CSV Preview Tool</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy: #0f172a;
+      --navy-2: #1e293b;
+      --gold: #d99a28;
+      --gold-light: #f8d77b;
+      --sand: #fff7e6;
+      --cream: #fffdf7;
+      --terracotta: #b85c38;
+      --teal: #0f766e;
+      --soft-blue: #e8f1ff;
+      --border: rgba(15, 23, 42, 0.10);
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--navy);
+      font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(248, 215, 123, 0.38), transparent 30%),
+        radial-gradient(circle at 92% 8%, rgba(15, 118, 110, 0.18), transparent 32%),
+        radial-gradient(circle at 50% 100%, rgba(184, 92, 56, 0.08), transparent 40%),
+        linear-gradient(160deg, #fffdf7 0%, #fff7e6 42%, #eef4ff 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, .serif-accent {
+      font-family: "Lora", Georgia, serif;
+    }
+
+    .app-shell {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 34px 18px 50px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--navy);
+    }
+
+    .brand-icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      color: white;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--navy), var(--teal));
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
+    }
+
+    .glass-card {
+      background: rgba(255, 253, 247, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero-card {
+      max-width: 920px;
+      margin: 24px auto 0;
+      padding: clamp(28px, 5vw, 56px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, transparent 0%, rgba(217, 154, 40, 0.10) 45%, transparent 75%),
+        radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.10), transparent 34%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 15px;
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: 800;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #fff3c4, #ffffff);
+      border: 1px solid rgba(217, 154, 40, 0.30);
+      box-shadow: 0 12px 28px rgba(217, 154, 40, 0.16);
+    }
+
+    .title {
+      margin: 18px 0 12px;
+      color: var(--navy);
+      font-size: clamp(34px, 6vw, 62px);
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+    }
+
+    .title span {
+      color: var(--terracotta);
+    }
+
+    .subtitle {
+      max-width: 660px;
+      margin: 0 auto;
+      color: #475569;
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .upload-zone {
+      margin-top: 34px;
+      padding: clamp(32px, 6vw, 58px) 22px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 28px;
+      border: 2px dashed rgba(217, 154, 40, 0.85);
+      background:
+        linear-gradient(135deg, rgba(255, 247, 230, 0.92), rgba(232, 241, 255, 0.88));
+      transition: 0.25s ease;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      transform: translateY(-4px);
+      border-color: var(--teal);
+      box-shadow: 0 24px 40px rgba(15, 118, 110, 0.13);
+    }
+
+    .upload-icon {
+      width: 86px;
+      height: 86px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 20px;
+      color: var(--navy);
+      font-size: 42px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, var(--gold-light), #ffffff);
+      border: 1px solid rgba(217, 154, 40, 0.30);
+    }
+
+    .btn-premium {
+      border: 0;
+      color: #ffffff;
+      font-weight: 850;
+      border-radius: 16px;
+      padding: 13px 22px;
+      background: linear-gradient(135deg, var(--navy), var(--teal));
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.20);
+      transition: 0.2s ease;
+    }
+
+    .btn-premium:hover {
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 20px 42px rgba(15, 23, 42, 0.24);
+    }
+
+    .btn-gold {
+      border: 0;
+      color: var(--navy);
+      font-weight: 900;
+      border-radius: 16px;
+      padding: 11px 18px;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      box-shadow: 0 14px 28px rgba(217, 154, 40, 0.22);
+    }
+
+    .hint-box {
+      margin-top: 22px;
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid var(--border);
+      color: #475569;
+    }
+
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    .table-card {
+      padding: clamp(20px, 3vw, 34px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .table-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--gold), var(--teal), var(--terracotta));
+    }
+
+    .table-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .table-card-head .badge-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--navy);
+      background: linear-gradient(135deg, #fff3c4, #fff7e6);
+      border: 1px solid rgba(217, 154, 40, 0.28);
+    }
+
+    .btn-outline-danger {
+      border-radius: 14px !important;
+      font-weight: 700;
+      border-width: 1.5px !important;
+      transition: 0.2s ease;
+    }
+
+    .btn-outline-danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(220, 38, 38, 0.16);
+    }
+
+    .section-title {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(26px, 4vw, 42px);
+      letter-spacing: -0.045em;
+      font-weight: 950;
+    }
+
+    .search-wrap {
+      position: relative;
+      margin: 24px 0;
+    }
+
+    .search-wrap i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+    }
+
+    .search-input {
+      min-height: 56px;
+      padding-left: 48px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+    }
+
+    .table-responsive {
+      margin-top: 20px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: white;
+      max-height: 68vh;
+      overflow: auto;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .table {
+      margin-bottom: 0;
+    }
+
+    .table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      color: #ffffff;
+      font-size: 12.5px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+      border: 0;
+      padding: 17px 14px;
+    }
+
+    .table tbody td {
+      padding: 16px 14px;
+      vertical-align: middle;
+      border-color: rgba(15, 23, 42, 0.06);
+      font-size: 14.5px;
+    }
+
+    .table tbody tr {
+      transition: 0.18s ease;
+    }
+
+    .table tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.015);
+    }
+
+    .table tbody tr:hover {
+      background: #fff7e6;
+    }
+
+    .state-pill {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: var(--navy);
+      background: #fff3c4;
+      border: 1px solid rgba(217, 154, 40, 0.28);
+      font-weight: 900;
+    }
+
+    .preview-btn {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      color: white;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--terracotta), var(--gold));
+      box-shadow: 0 12px 22px rgba(184, 92, 56, 0.22);
+    }
+
+    .pagination-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .page-info {
+      min-width: 120px;
+      text-align: center;
+      font-weight: 900;
+      color: #475569;
+    }
+
+    .modal-content {
+      overflow: hidden;
+      border: 0;
+      border-radius: 30px;
+      box-shadow: 0 34px 90px rgba(15, 23, 42, 0.36);
+      background: var(--cream);
+    }
+
+    .modal-header {
+      color: #ffffff;
+      border: 0;
+      padding: 22px 26px;
+      background: linear-gradient(135deg, var(--navy), var(--teal));
+    }
+
+    .modal-body {
+      padding: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(248, 215, 123, 0.25), transparent 28%),
+        var(--cream);
+    }
+
+    .image-frame {
+      position: relative;
+      min-height: 420px;
+      overflow: hidden;
+      border-radius: 26px;
+      background:
+        linear-gradient(135deg, #fff7e6, #e8f1ff);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 22px 45px rgba(15, 23, 42, 0.13);
+    }
+
+    .property-img {
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      max-height: 620px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-placeholder {
+      min-height: 420px;
+      display: none;
+      place-items: center;
+      padding: 28px;
+      text-align: center;
+      color: #475569;
+    }
+
+    .image-placeholder i {
+      color: var(--gold);
+      font-size: 56px;
+      margin-bottom: 14px;
+    }
+
+    .info-panel {
+      height: 100%;
+      padding: 22px;
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+    }
+
+    .info-box {
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255, 247, 230, 0.92), rgba(232, 241, 255, 0.78));
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .label-small {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .value-text {
+      margin-top: 8px;
+      margin-bottom: 0;
+      color: var(--navy);
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .copy-stack {
+      margin-top: 22px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .toast {
+      border-radius: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .image-frame,
+      .property-img,
+      .image-placeholder {
+        min-height: 280px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <section id="uploadPage" class="page-section active">
+      <div class="glass-card hero-card text-center">
+        <div class="hero-inner">
+          <div class="eyebrow">
+            <i class="bi bi-stars"></i>
+            Premium CSV Workflow
+          </div>
+
+          <h1 class="title">Upload CSV.<br><span>Preview Property.</span><br>Copy Prompt.</h1>
+
+          <p class="subtitle">
+            CSV ফাইল আপলোড করুন
+          </p>
+
+          <div id="uploadZone" class="upload-zone">
+            <div class="upload-icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+            <h3 class="fw-black mb-2">Drag & Drop CSV File</h3>
+            <p class="text-muted mb-4">অথবা বাটনে ক্লিক করে CSV নির্বাচন করুন</p>
+            <input type="file" id="csvFile" accept=".csv,text/csv" hidden>
+            <button type="button" class="btn btn-premium" id="chooseFileBtn">
+              <i class="bi bi-file-earmark-spreadsheet me-2"></i>Select CSV File
+            </button>
+          </div>
+
+       
+        </div>
+      </div>
+    </section>
+
+    <section id="tablePage" class="page-section">
+      <div class="glass-card table-card">
+        <div class="table-card-head">
+          <span class="badge-count"><i class="bi bi-houses-fill"></i> <span id="rowCountLabel">0 Properties</span></span>
+          <button type="button" class="btn btn-outline-danger rounded-4 px-4 py-2 fw-bold" id="clearBtn">
+            <i class="bi bi-trash3 me-1"></i>Clear Data
+          </button>
+        </div>
+
+        <input id="searchInput" type="hidden" value="">
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th style="width: 54px;"><input type="checkbox" id="selectAll"></th>
+                <th>Agent / Agency</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Zip</th>
+                <th>Preview</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-box">
+          <button type="button" class="btn btn-gold" id="prevBtn"><i class="bi bi-arrow-left me-1"></i>Previous</button>
+          <span id="pageInfo" class="page-info"></span>
+          <button type="button" class="btn btn-gold" id="nextBtn">Next<i class="bi bi-arrow-right ms-1"></i></button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title fw-bold mb-0"><i class="bi bi-eye-fill me-2"></i>Property Preview</h4>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-4">
+            <div class="col-lg-7">
+              <div class="image-frame">
+                <img id="modalImage" class="property-img" alt="Property Image Preview">
+                <div id="imagePlaceholder" class="image-placeholder">
+                  <div>
+                    <i class="bi bi-image-alt d-block"></i>
+                    <h5 class="fw-bold">Image Preview Not Available</h5>
+                    <p class="mb-0">CSV image link empty, invalid, blocked, or not publicly accessible.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="info-panel">
+                <div class="info-box mb-3">
+                  <div class="label-small">Property Address</div>
+                  <h5 id="modalAddress" class="value-text"></h5>
+                </div>
+
+                <div class="info-box mb-3">
+                  <div class="label-small">Agent Name</div>
+                  <h5 id="modalAgent" class="value-text"></h5>
+                </div>
+
+                <div class="info-box mb-3">
+                  <div class="label-small">Image URL Detected</div>
+                  <p id="modalImageUrl" class="mb-0 small text-break text-muted"></p>
+                </div>
+
+                <div class="copy-stack">
+                  <button type="button" class="btn btn-premium w-100" id="copyPrompt1">
+                    <i class="bi bi-copy me-2"></i>Copy Prompt 1
+                  </button>
+                  <button type="button" class="btn btn-premium w-100" id="copyPrompt2">
+                    <i class="bi bi-copy me-2"></i>Copy Prompt 2
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-4">
+    <div id="copyToast" class="toast text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body fw-bold" id="toastText">Copied</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const PROMPT_ONE = `Create a premium portrait coupon for Arizona luxury homeowners.
+
+STYLE:
+Luxury moving service advertisement, realtor co-branded marketing piece, upscale Arizona lifestyle aesthetic, modern direct-mail design, clean luxury typography, sophisticated spacing, elegant hierarchy.
+
+LAYOUT:
+The listed home photo should be the dominant visual element and feel like the featured property.
+
+PROPERTY ADDRESS:
+[House Address]
+
+PROPERTY PHOTO RULE:
+Use the property photo exactly as uploaded. Integrate the property address elegantly somewhere within the home image using refined typography. No mountains, cactus, added scenery, sky replacement, or changes to the house are allowed. Only professional lighting and color enhancement may be applied.
+
+Headline:
+MOVERS FOR PEOPLE WITH NICE THINGS
+
+Subheadline:
+Exclusive Offer from [Agent Name] - Save 10% Today!
+
+Place logo in a professional lockup, with equal visual importance, making it obvious that the moving company. The logo should feel naturally integrated into the luxury layout — not pasted on. Use premium framed placement, or elegant badge styling.
+
+Call To Action:
+Call 480.695.6621 for a Free In-Home Estimate
+
+ARIZONA VIBE:
+-Incorporate subtle Arizona-inspired design elements, varying naturally between generations:
+-Sonoran desert landscape
+-Saguaro cactus silhouettes
+-Camelback Mountain inspiration
+-Arizona sunset gradients
+-Warm terracotta accents
+-Desert gold highlights
+-Do NOT make the design look rustic or western-themed.
+-Keep it modern, upscale, and professional.
+
+RANDOMIZED CREATIVE VARIATION (important):
+For each generation, vary several of these elements naturally:
+-Different coupon layouts
+-Different Arizona-inspired decorative elements
+-Different luxury framing styles
+-Different typography pairings
+-Different geometric accents
+-Different premium textures
+-Different lighting effects
+-Different border treatments
+
+Each generation should feel like a new professionally designed realtor marketing piece while maintaining brand consistency.
+
+COLOR PALETTE:
+-Mix variations of:
+-Desert Gold
+-Warm Sand
+-Terracotta
+-Soft Ivory
+-Charcoal
+-Deep Navy
+-Copper Accents
+
+Image size:
+4:5 ratio.
+
+Avoid:
+-stock-photo look,
+-call icon,
+-cheap flyer look,
+-clutter,
+-cartoon graphics,
+-low-end coupon aesthetics,
+-generic moving company designs.
+-Use ONLY the uploaded logos with NO additional text around them.
+-NO additional text
+
+Subheadline এ বেগ্রাউন্ড/ বর্ডারের মাধ্যমে সৌন্দর্য বাড়াও .`;
+
+    const PROMPT_TWO = `Create a premium portrait coupon for Arizona luxury homeowners.
+
+STYLE:
+Luxury moving service advertisement, realtor co-branded marketing piece, upscale Arizona lifestyle aesthetic, modern direct-mail design, clean luxury typography, sophisticated spacing, elegant hierarchy.
+
+LAYOUT:
+The listed home photo should be the dominant visual element and feel like the featured property.
+
+PROPERTY ADDRESS:
+[House Address]
+
+PROPERTY PHOTO RULE:
+Use the property photo exactly as uploaded. Integrate the property address elegantly somewhere within the home image using refined typography. No mountains, cactus, added scenery, sky replacement, or changes to the house are allowed. Only professional lighting and color enhancement may be applied.
+
+Headline:
+MOVERS FOR PEOPLE WITH NICE THINGS
+
+Subheadline:
+Exclusive Offer from [Agent Name] - Save 10% Today!
+
+Place both logos together in a professional partnership lockup, with equal visual importance, making it obvious that the moving company and realtor are trusted partners.The logos should feel naturally integrated into the luxury layout — not pasted on. Use premium framed placement, or elegant badge styling.
+
+Call To Action:
+Call 480.695.6621 for a Free In-Home Estimate
+
+ARIZONA VIBE:
+-Incorporate subtle Arizona-inspired design elements, varying naturally between generations:
+-Sonoran desert landscape
+-Saguaro cactus silhouettes
+-Camelback Mountain inspiration
+-Arizona sunset gradients
+-Warm terracotta accents
+-Desert gold highlights
+-Do NOT make the design look rustic or western-themed.
+-Keep it modern, upscale, and professional.
+
+RANDOMIZED CREATIVE VARIATION (important):
+For each generation, vary several of these elements naturally:
+-Different coupon layouts
+-Different Arizona-inspired decorative elements
+-Different luxury framing styles
+-Different typography pairings
+-Different geometric accents
+-Different premium textures
+-Different lighting effects
+-Different border treatments
+
+Each generation should feel like a new professionally designed realtor marketing piece while maintaining brand consistency.
+
+COLOR PALETTE:
+-Mix variations of:
+-Desert Gold
+-Warm Sand
+-Terracotta
+-Soft Ivory
+-Charcoal
+-Deep Navy
+-Copper Accents
+
+Image size:
+-4:5 ratio.
+
+Avoid:
+-stock-photo look,
+-call icon,
+-cheap flyer look,
+-clutter,
+-X symbol and cross mark between logos,
+-cartoon graphics,
+-low-end coupon aesthetics,
+-generic moving company designs,
+-Use ONLY the uploaded logos with NO additional text around them,
+-NO additional text,
+
+Subheadline এ বেগ্রাউন্ড/ বর্ডারের মাধ্যমে সৌন্দর্য বাড়াও.`;
+
+    let allData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    let currentRow = null;
+    const rowsPerPage = 10;
+
+    const uploadPage = document.getElementById("uploadPage");
+    const tablePage = document.getElementById("tablePage");
+    const csvFile = document.getElementById("csvFile");
+    const uploadZone = document.getElementById("uploadZone");
+    const tableBody = document.getElementById("tableBody");
+    const searchInput = document.getElementById("searchInput");
+    const pageInfo = document.getElementById("pageInfo");
+
+    document.getElementById("chooseFileBtn").addEventListener("click", event => {
+      event.stopPropagation();
+      csvFile.click();
+    });
+
+    uploadZone.addEventListener("click", () => csvFile.click());
+
+    uploadZone.addEventListener("dragover", event => {
+      event.preventDefault();
+      uploadZone.classList.add("dragover");
+    });
+
+    uploadZone.addEventListener("dragleave", () => {
+      uploadZone.classList.remove("dragover");
+    });
+
+    uploadZone.addEventListener("drop", event => {
+      event.preventDefault();
+      uploadZone.classList.remove("dragover");
+      handleFile(event.dataTransfer.files[0]);
+    });
+
+    csvFile.addEventListener("change", event => {
+      handleFile(event.target.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file || !file.name.toLowerCase().endsWith(".csv")) {
+        alert("Please upload a valid CSV file.");
+        return;
+      }
+
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: header => String(header || "").trim(),
+        complete: results => {
+          allData = results.data
+            .map(cleanRow)
+            .filter(row => row.Agent || row.Address || row.Agency);
+
+          if (!allData.length) {
+            alert("No valid rows found in the CSV.");
+            return;
+          }
+
+          currentPage = 1;
+          loadTablePage();
+        },
+        error: error => {
+          alert("CSV parse error: " + error.message);
+        }
+      });
+    }
+
+    function cleanRow(row) {
+      const cleaned = {};
+      Object.keys(row || {}).forEach(key => {
+        cleaned[String(key || "").trim()] = typeof row[key] === "string" ? row[key].trim() : row[key];
+      });
+      return cleaned;
+    }
+
+    function loadTablePage() {
+      filteredData = [...allData];
+      uploadPage.classList.remove("active");
+      tablePage.classList.add("active");
+      renderTable();
+    }
+
+    function getValue(row, possibleKeys) {
+      const rowKeys = Object.keys(row || {});
+      const normalizedMap = new Map(rowKeys.map(key => [normalizeKey(key), key]));
+
+      for (const key of possibleKeys) {
+        const exact = normalizedMap.get(normalizeKey(key));
+        if (exact && row[exact] !== undefined && row[exact] !== null && String(row[exact]).trim() !== "") {
+          return String(row[exact]).trim();
+        }
+      }
+
+      return "";
+    }
+
+    function normalizeKey(key) {
+      return String(key || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function getAgent(row) {
+      return getValue(row, ["Agent", "Agent Name", "Realtor", "Name"]);
+    }
+
+    function getAgency(row) {
+      return getValue(row, ["Agency", "Brokerage", "Company", "Office"]);
+    }
+
+    function getAddress(row) {
+      return getValue(row, ["Address", "Street Address", "Property Address", "House Address"]);
+    }
+
+    function getCity(row) {
+      return getValue(row, ["City"]);
+    }
+
+    function getState(row) {
+      return getValue(row, ["State", "ST"]);
+    }
+
+    function getZip(row) {
+      return getValue(row, ["Zip", "ZIP", "Zip Code", "Postal Code"]);
+    }
+
+    function getImageUrl(row) {
+      return getValue(row, [
+        "Image URL",
+        "Image Url",
+        "ImageURL",
+        "Image Link",
+        "Photo URL",
+        "Photo Url",
+        "Photo Link",
+        "Picture URL",
+        "Picture Link",
+        "Property Photo",
+        "Property Photo URL",
+        "Property Image",
+        "Property Image URL",
+        "Image",
+        "Photo",
+        "Link",
+        "URL"
+      ]);
+    }
+
+    function getFullAddress(row) {
+      const address = getAddress(row);
+      const city = getCity(row);
+      const state = getState(row);
+      const zip = getZip(row);
+
+      const cityStateZip = [city, [state, zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+      return [address, cityStateZip].filter(Boolean).join(", ");
+    }
+
+    function renderTable() {
+      const start = (currentPage - 1) * rowsPerPage;
+      const pageRows = filteredData.slice(start, start + rowsPerPage);
+
+      if (!pageRows.length) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-5">No matching data found.</td></tr>`;
+      } else {
+        tableBody.innerHTML = pageRows.map((row, index) => `
+          <tr>
+            <td><input type="checkbox" class="row-check"></td>
+            <td>
+              <div class="fw-bold">${escapeHtml(getAgent(row))}</div>
+              <div class="text-muted small">${escapeHtml(getAgency(row))}</div>
+            </td>
+            <td>${escapeHtml(getAddress(row))}</td>
+            <td>${escapeHtml(getCity(row))}</td>
+            <td><span class="state-pill">${escapeHtml(getState(row))}</span></td>
+            <td>${escapeHtml(getZip(row))}</td>
+            <td>
+              <button type="button" class="preview-btn" onclick="openPreview(${start + index})" title="Preview">
+                <i class="bi bi-eye-fill"></i>
+              </button>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById("prevBtn").disabled = currentPage === 1;
+      document.getElementById("nextBtn").disabled = currentPage === totalPages;
+
+      const countLabel = document.getElementById("rowCountLabel");
+      if (countLabel) {
+        countLabel.textContent = `${filteredData.length} Propert${filteredData.length === 1 ? "y" : "ies"}`;
+      }
+    }
+
+    function openPreview(index) {
+      currentRow = filteredData[index];
+      const address = getFullAddress(currentRow);
+      const agent = getAgent(currentRow);
+      const imageUrl = getImageUrl(currentRow);
+
+      document.getElementById("modalAddress").textContent = address || "Address not found";
+      document.getElementById("modalAgent").textContent = agent || "Agent not found";
+      document.getElementById("modalImageUrl").textContent = imageUrl || "No image URL detected";
+
+      setPreviewImage(imageUrl);
+
+      const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("previewModal"));
+      modal.show();
+    }
+
+    function setPreviewImage(imageUrl) {
+      const img = document.getElementById("modalImage");
+      const placeholder = document.getElementById("imagePlaceholder");
+
+      img.style.display = "none";
+      placeholder.style.display = "grid";
+      img.removeAttribute("src");
+
+      if (!imageUrl) return;
+
+      const normalizedUrl = normalizeImageUrl(imageUrl);
+      img.onload = () => {
+        placeholder.style.display = "none";
+        img.style.display = "block";
+      };
+
+      img.onerror = () => {
+        img.style.display = "none";
+        placeholder.style.display = "grid";
+      };
+
+      img.referrerPolicy = "no-referrer";
+      img.src = normalizedUrl;
+    }
+
+    function normalizeImageUrl(url) {
+      const cleanUrl = String(url || "").trim();
+      if (!cleanUrl) return "";
+      if (cleanUrl.startsWith("//")) return "https:" + cleanUrl;
+      if (!/^https?:\/\//i.test(cleanUrl)) return "https://" + cleanUrl;
+      return cleanUrl;
+    }
+
+    function generatePrompt(template) {
+      if (!currentRow) return "";
+      return template
+        .replaceAll("[House Address]", getFullAddress(currentRow))
+        .replaceAll("[Agent Name]", getAgent(currentRow));
+    }
+
+    async function copyText(text, message) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (error) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      document.getElementById("toastText").textContent = message;
+      bootstrap.Toast.getOrCreateInstance(document.getElementById("copyToast")).show();
+    }
+
+    document.getElementById("copyPrompt1").addEventListener("click", () => {
+      copyText(generatePrompt(PROMPT_ONE), "Prompt 1 Copied");
+    });
+
+    document.getElementById("copyPrompt2").addEventListener("click", () => {
+      copyText(generatePrompt(PROMPT_TWO), "Prompt 2 Copied");
+    });
+
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.toLowerCase().trim();
+
+      filteredData = allData.filter(row => {
+        const searchable = [
+          getAgent(row),
+          getAgency(row),
+          getAddress(row),
+          getCity(row),
+          getState(row),
+          getZip(row)
+        ].join(" ").toLowerCase();
+
+        return searchable.includes(query);
+      });
+
+      currentPage = 1;
+      renderTable();
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+      }
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+      }
+    });
+
+    document.getElementById("selectAll").addEventListener("change", event => {
+      document.querySelectorAll(".row-check").forEach(checkbox => {
+        checkbox.checked = event.target.checked;
+      });
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      location.reload();
+    });
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+  </script>
+</body>
+</html>
